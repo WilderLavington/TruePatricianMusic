@@ -1,14 +1,14 @@
 #include <iostream>
 #include "TruePatricianMusic.h"
- #include <fstream>
- #include <sstream>
- #include <string>
- #include <iomanip>
- #include <locale>
- #include <vector>
- #include <algorithm>
- #include <cstdlib> //the standard C library header
- #include <algorithm>.
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <iomanip>
+#include <locale>
+#include <vector>
+#include <algorithm>
+#include <cstdlib> //the standard C library header
+#include <algorithm>.
 
 using namespace std;
 
@@ -27,13 +27,6 @@ void split(const string& s, char c,vector<string>& v)
          v.push_back(s.substr(i, s.length()));
    }
 }
-struct InfoStorage
-{
-    string artist;
-    string album;
-    int rating;
-    string genre;
-};
 int main()
 {
     bool OGRaps= true;
@@ -71,7 +64,11 @@ int main()
             split(s, '@', v);
             for (int p = 0; p<v.size();p++)
             {
-            if(p%3==0)
+            if (p==0)
+                {
+                Music[counter].artist = v[p];
+                }
+            else if(p%3==0)
                 {
                 Music[counter].genre = v[p];
                 }
@@ -79,10 +76,6 @@ int main()
                 {
                 int newValue = atoi(v[p].c_str());
                 Music[counter].rating = newValue;
-                }
-            else if (p==0)
-                {
-                Music[counter].artist = v[p];
                 }
             else
                 {
@@ -96,19 +89,64 @@ int main()
 	{
     std::cout << "Unable to open file" << std::endl << std::endl;
 	}
-    //now store each struct in music to genre
+    //find all genres
     vector<std::string> genres;
     for(int h = 0;h<lines-1;h++)
     {
-        //check contains
-        //cout<<Music[h].genre;
         if (std::find(genres.begin(), genres.end(), Music[h].genre) == genres.end())
         {
         genres.push_back( Music[h].genre);
         }
     }
-
-    //cout<<genres.size()<<endl;
+    //sort Info storage with hash function
+    //create seperate hash tables for each genre
+    //also clone genres, might use later
+    vector <string> genre = genres;
+    while(!genre.empty())
+{ HashMap hash;
+    string current = genre.back();
+    string Folder = "Genres//";
+    genre.pop_back();
+    for(int t = 0;t<lines-1;t++)
+    {
+        //need to create hash key to run through insert
+        int key = Music[t].rating;
+        string stuff = Music[t].artist;
+        string value = Music[t].album;
+        value +=":";
+        value += stuff;
+        //cout<<stuff;
+        //cout<<value<<endl;
+        hash.Insert(key, value);
+    }
+    //now run through current hashmap, and push into vector now ordered by rating
+    //call it current->append txt
+    current  = current.append(".txt");
+    Folder = Folder.append(current);
+    //then store ordered values in txt file
+    ofstream myfile;
+    myfile.open (Folder);
+    if (myfile.is_open())
+    {
+    for(int k = 0; k<128;k++)
+    {
+        HashNode * temp = hash.access(k);
+        if(temp)
+        {while(temp->next)
+        {
+        string tempvalue;
+        tempvalue = temp->value;
+        myfile << k;
+        myfile << ": ";
+        myfile << tempvalue;
+        myfile << "\n";
+        temp = temp->next;
+        }}
+    }
+    myfile.close();
+    }
+}
+//now we push all genres off stack and then put every thing instorage into Genre
     string option = " ";
     while(option!="8"){
         option.erase();
@@ -125,6 +163,32 @@ int main()
         if(option=="1"){
         }
         else if(option=="2"){
+                cout<<"what is your favorite genre"<<endl;
+            string input;
+            cin>>input;
+            input = input.append(".txt");
+            std::string line;
+            std::ifstream backstory (input);
+            if (backstory.is_open())
+            {
+                while (backstory.good())
+                {
+                getline(backstory,line);
+                vector<string> v;
+                split(line, ' ', v);
+                for(int i = 0;i<v.size();i++)
+                {
+                cout<<v[i]<<" "<<endl;
+                }
+                cout<<endl;
+                }
+            backstory.close();
+                }
+            else
+            {
+		std::cout << "Give us a real genre fool" << std::endl << std::endl;
+            }
+
         }
         else if(option=="3"){
         }
@@ -149,6 +213,5 @@ void mainMenu(){
     cout<<"5. Add user"<<endl;
     cout<<"6. Delete your shite account and shite taste"<<endl;
     cout<<"7. Top 3 true patricians lmao ayyy"<<endl;
-    cout<<"8. GET OFF THE FUCKING BOARD"<<endl;
+    cout<<"8. GET OFF THE DUCKING BOARD"<<endl;
 }
-
